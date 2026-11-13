@@ -3,7 +3,13 @@
 The native Agents panel with a **Statistics** link in the Codex header:
 one activity calendar and combined totals across your local Codex accounts.
 
+![Agents panel with demonstration accounts](agents-preview.png)
+
+Statistics appears beside Codex and combines activity across its local accounts.
+
 ![Statistics with demonstration data](preview.png)
+
+Both screenshots use fictional accounts and activity.
 
 The panel follows your Omarchy theme, including light and dark themes.
 It refreshes automatically, shows the last saved totals immediately, and uses
@@ -118,7 +124,7 @@ agent history intact.
 
 Omarchy plugins run unsandboxed inside Shell. Source review and testing remain
 necessary; marketplace listing or automated checks are not a security audit.
-The preview uses synthetic activity and contains no account or chat data.
+The screenshots use synthetic activity and contain no real account or chat data.
 
 ## Development
 
