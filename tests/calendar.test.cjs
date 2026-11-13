@@ -1,0 +1,36 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const context = vm.createContext({});
+vm.runInContext(fs.readFileSync(__dirname + '/../Calendar.js', 'utf8'), context);
+for (const day of ['2026-11-13', '2024-02-29', '2025-01-01', '2026-03-29']) {
+  const cells = context.calendar(new Date(day + 'T12:00:00'));
+  assert.equal(cells.length % 7, 0);
+  const valid = cells.filter(x => x.valid);
+  assert.ok(valid.length >= 365 && valid.length <= 366);
+  assert.equal(valid.at(-1).date, day);
+  assert.equal(new Set(cells.map(x => x.date)).size, cells.length);
+}
+const snapshot = { schemaVersion: 1, days: {'2026-11-13': {tokens: 120, prompts: 1, seconds: 30}} };
+for (const key of ['totalTokens','totalPrompts','agentSeconds','totalSessions','activeDays','currentStreak','longestStreak','peakTokens','accounts','files','partialFiles']) snapshot[key] = 1;
+assert.equal(context.validate(snapshot).days['2026-11-13'].tokens, 120);
+const attack = JSON.parse(JSON.stringify(snapshot));
+attack.totalTokens = '<img src="https://example.invalid/tracker">';
+assert.throws(() => context.validate(attack));
+attack.totalTokens = 1;
+attack.days['2026-11-13'].tokens = '<b>123</b>';
+assert.throws(() => context.validate(attack));
+const qml = fs.readFileSync(__dirname + '/../StatisticsView.qml', 'utf8');
+assert.match(qml, /component PlainText: Text\s*\{\s*textFormat: Text.PlainText/);
+const panel = fs.readFileSync(__dirname + '/../AgentsPanel.qml', 'utf8');
+assert.match(panel, /tooltip: statisticsStrings.t\("closeStatistics"\)/);
+assert.match(panel, /onOpenedChanged: if \(!opened\) \{\s*statisticsOpen = false/);
+assert.doesNotMatch(qml, /text: strings.t\("refresh"\)/);
+assert.doesNotMatch(qml, /strings.t\("scope"\)|strings.t\("summary"\)/);
+assert.match(qml, /Ui.PanelToolTip \{ visible: metricHover.containsMouse; text: modelData.hint \}/);
+const reorderContext = vm.createContext({});
+vm.runInContext(fs.readFileSync(__dirname + '/../vendor/Reorder.js', 'utf8'), reorderContext);
+assert.equal(reorderContext.dragTargetFor(1, 25, 20, 1, 4, [20,20,30,20]), 2);
+assert.equal(reorderContext.dropOffset(1, 3, 20, [20,20,30,20]), 50);
+assert.equal(reorderContext.rowShift(2, 1, 3, 25, 20), -20);
+console.log('Calendar, leap year, day bounds, markup input and display sink checks passed.');

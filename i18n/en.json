@@ -1,0 +1,35 @@
+{
+  "title": "Statistics",
+  "accounts": {
+    "one": "%1 account · combined local history",
+    "other": "%1 accounts · combined local history"
+  },
+  "totalTokens": "Lifetime tokens",
+  "agentTime": "Agent time",
+  "sessions": "Sessions",
+  "currentStreak": "Current streak",
+  "longestStreak": "Longest streak",
+  "tokens": "Tokens",
+  "prompts": "Prompts",
+  "loading": "Loading statistics…",
+  "lastYear": "Activity · last 12 months",
+  "less": "Less",
+  "more": "More",
+  "duration": "%1h %2m",
+  "dayDetail": "%1 · %2 tokens · %3 · %4 prompts",
+  "selectDay": "Select a square for daily activity.",
+  "partial": "Some activity could not be read.",
+  "error": "Could not update statistics.",
+  "heading": "Agents",
+  "updating": "Statistics · updating…",
+  "loadingHistory": "Reading local history…",
+  "closeStatistics": "Back to Agents",
+  "tokenHint": "Tokens recorded locally, including cached input.",
+  "timeHint": "Recorded agent turns. Overlapping turns count once; personal working hours are not measured.",
+  "sessionHint": "Threads with recorded local activity.",
+  "streakHint": "Consecutive days with recorded activity.",
+  "days": {
+    "one": "%1 day",
+    "other": "%1 days"
+  }
+}

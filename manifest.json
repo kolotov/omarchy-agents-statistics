@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "id": "gkdev.agents",
+  "name": "Agents Statistics",
+  "version": "1.1.1",
+  "author": "Georgii Kolotov",
+  "license": "MIT",
+  "description": "The native Agents panel with combined local Codex statistics across accounts.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "activation": "on-demand",
+  "entryPoints": {
+    "barWidget": "AgentsPanel.qml"
+  },
+  "barWidget": {
+    "displayName": "Agents Statistics",
+    "description": "Subscription limits and account controls, with a combined local Codex activity calendar.",
+    "category": "AI",
+    "aliases": [
+      "agents",
+      "model-usage"
+    ],
+    "allowMultiple": false,
+    "defaults": {
+      "providers": {
+        "claude": {
+          "enabled": true
+        },
+        "codex": {
+          "enabled": true
+        },
+        "grok": {
+          "enabled": true
+        },
+        "kimi": {
+          "enabled": true
+        },
+        "cursor": {
+          "enabled": true
+        },
+        "grokbot": {
+          "enabled": true
+        },
+        "copilot": {
+          "enabled": true
+        },
+        "muse": {
+          "enabled": true
+        },
+        "agy": {
+          "enabled": true
+        },
+        "kimchi": {
+          "enabled": true
+        },
+        "hermes": {
+          "enabled": true
+        },
+        "devin": {
+          "enabled": true
+        },
+        "vibe": {
+          "enabled": true
+        },
+        "qwen": {
+          "enabled": true
+        },
+        "opencode": {
+          "enabled": true
+        },
+        "zai": {
+          "enabled": true
+        },
+        "ollama": {
+          "enabled": true
+        },
+        "minimax": {
+          "enabled": true
+        },
+        "openrouter": {
+          "enabled": true
+        },
+        "deepseek": {
+          "enabled": true
+        },
+        "fireworks": {
+          "enabled": true
+        },
+        "synthetic": {
+          "enabled": true
+        },
+        "local": {
+          "enabled": true
+        }
+      },
+      "refreshIntervalSec": 900,
+      "syncMode": "Off",
+      "syncDir": "",
+      "syncFileName": "",
+      "syncDeviceId": ""
+    },
+    "schema": [
+      {
+        "key": "refreshIntervalSec",
+        "type": "integer",
+        "label": "Refresh interval (seconds)",
+        "min": 30,
+        "max": 3600,
+        "step": 30,
+        "defaultValue": 900
+      },
+      {
+        "key": "syncMode",
+        "type": "enum",
+        "label": "Synced aggregation",
+        "options": [
+          "Off",
+          "On"
+        ],
+        "defaultValue": "Off",
+        "description": "When On, write this machine's local usage snapshot and merge snapshots from other machines."
+      },
+      {
+        "key": "syncDir",
+        "type": "path",
+        "label": "Sync folder",
+        "defaultValue": "",
+        "description": "A folder synced by Syncthing, Dropbox, rsync, etc."
+      },
+      {
+        "key": "syncFileName",
+        "type": "string",
+        "label": "Snapshot file name",
+        "defaultValue": "",
+        "description": "Optional. Defaults to <hostname>.json. Use a different file name on each machine, such as laptop.json or desktop.json."
+      },
+      {
+        "key": "syncDeviceId",
+        "type": "string",
+        "label": "Device id",
+        "defaultValue": "",
+        "description": "Optional stable device name used inside synced aggregate snapshots."
+      }
+    ]
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.agents"
+  }
+}
