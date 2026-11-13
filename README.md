@@ -1,7 +1,7 @@
 # Agents Statistics for Omarchy
 
-The native Agents panel with a **Statistics** button: one activity calendar
-and combined totals across your local Codex accounts.
+The native Agents panel with a **Statistics** link in the Codex header:
+one activity calendar and combined totals across your local Codex accounts.
 
 ![Statistics with demonstration data](preview.png)
 
@@ -33,7 +33,8 @@ The installation command asks for confirmation before adding third-party code.
 
 ## Use
 
-Open **Agents → Statistics**, or press **S** in the Agents panel.
+Open **Agents → Codex → Statistics**, or press **S** while Codex is listed
+in the Agents panel.
 Choose **Tokens**, **Agent time**, or **Prompts**, then hover over or select a
 day. All locally registered Codex account homes are combined; shared history
 counts once.
@@ -66,6 +67,12 @@ Agent time measures agent activity, including waiting within a recorded turn,
 rather than personal working hours or the lifetime of an open chat. Unfinished
 turns, old turns without timing, and deleted history are excluded. Token totals
 are not prices, billable units, or subscription quota percentages.
+
+## TODO
+
+- Add Claude Code and Grok statistics. Contributions are welcome; each provider
+  needs local history discovery, documented counter and time semantics, and
+  deduplication before it can appear in Statistics. They are not supported yet.
 
 ## Update and remove
 

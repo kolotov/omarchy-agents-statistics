@@ -17,9 +17,15 @@ Panel {
   property bool statisticsOpen: false
   Commons.Translations { id: statisticsStrings; directory: Qt.resolvedUrl("i18n") }
   function showStatistics() {
+    if (statisticsProviderIndex < 0) return
     statisticsOpen = true
     panel.ensureContent()
-    if (panel.loadedContent) panel.loadedContent.forceActiveFocus()
+    focusKeys()
+  }
+  function closeStatistics() {
+    statisticsOpen = false
+    pointAt("statistics", statisticsProviderIndex)
+    focusKeys()
   }
 
   // Items inside the panel's lazily built content, null until it first
@@ -40,6 +46,7 @@ Panel {
   // Every subscription on one page, limits first: the question this panel
   // answers is how much room is left, and where.
   readonly property var providers: dragProviders !== null ? dragProviders : usage.panelProviders
+  readonly property int statisticsProviderIndex: providers.findIndex(function(provider) { return provider.providerId === "codex" })
 
   // A model on another machine of the tailnet carries its host. Away, it
   // offers nothing; unpaired, only pairing, which is what fetches its key.
@@ -286,7 +293,9 @@ Panel {
         }
         // Every agent's line is a stop, so Ctrl+Up/Down can move it: its
         // terminal button when it has a harness of its own, else its mark.
-        rows.push([{ kind: lineStop(p), index: p }])
+        var header = [{ kind: lineStop(p), index: p }]
+        if (p === statisticsProviderIndex) header.unshift({ kind: "statistics", index: p })
+        rows.push(header)
         var accounts = providerAccounts(providers[p])
         if (accounts.length < 2) {
           if (needsSignIn(providers[p])) rows.push([{ kind: "providerSignin", index: p }])
@@ -305,7 +314,6 @@ Panel {
       if (!blankSlate) {
         var tiles = []
         for (var j = 0; j < starterPrompts.length; j++) tiles.push({ kind: "starter", index: j })
-        rows.push([{ kind: "statistics", index: 0 }])
         rows.push(tiles)
       }
     }
@@ -369,7 +377,7 @@ Panel {
       var row = keyRows[keyRow]
       var use = -1
       for (var c = 0; c < row.length; c++) if (row[c].kind === "account") use = c
-      var line = ["provider", "providerLaunch", "modelToggle", "modelLaunch", "modelPair", "modelDisconnect", "modelShare", "modelHeader", "localDownload"].indexOf(row[0].kind) >= 0
+      var line = ["provider", "providerLaunch", "statistics", "modelToggle", "modelLaunch", "modelPair", "modelDisconnect", "modelShare", "modelHeader", "localDownload"].indexOf(row[0].kind) >= 0
       keyColumn = use >= 0 ? use : line ? row.length - 1 : Math.min(keyColumn, row.length - 1)
     } else if (dx !== 0) {
       keyColumn = clamp(Math.min(keyColumn, keyRows[keyRow].length - 1) + dx, 0, keyRows[keyRow].length - 1)
@@ -380,7 +388,7 @@ Panel {
   function providerIndexOfKey() {
     var target = keyTarget
     if (!target) return -1
-    if (["provider", "providerSignin", "providerLaunch", "modelToggle", "modelLaunch", "modelPair", "modelDisconnect", "modelShare", "modelHeader", "modelLogs", "localDownload"].indexOf(target.kind) >= 0) return target.index
+    if (["provider", "providerSignin", "providerLaunch", "statistics", "modelToggle", "modelLaunch", "modelPair", "modelDisconnect", "modelShare", "modelHeader", "modelLogs", "localDownload"].indexOf(target.kind) >= 0) return target.index
     if (["account", "autoswitch", "signin"].indexOf(target.kind) < 0) return -1
     var entry = accountEntries[target.index]
     return entry ? providers.indexOf(entry.provider) : -1
@@ -1540,7 +1548,7 @@ Panel {
       blocked: root.renaming || root.deleteTarget !== null
       onActivateRequested: function(modifiers) { if (root.statisticsOpen) statisticsView.activate(); else root.activateSelection(modifiers) }
       onCloseRequested: {
-        if (root.statisticsOpen) { root.statisticsOpen = false; return }
+        if (root.statisticsOpen) { root.closeStatistics(); return }
         if (root.dragIndex >= 0) root.settleProviderDrag(true)
         else if (root.addStage !== "") root.cancelAdd()
         else root.close()
@@ -1578,11 +1586,7 @@ Panel {
               onClicked: statisticsView.back()
             }
           }
-          onBack: {
-            root.statisticsOpen = false
-            root.pointAt("statistics", 0)
-            keyCatcher.forceActiveFocus()
-          }
+          onBack: root.closeStatistics()
         }
       }
 
@@ -1673,11 +1677,6 @@ Panel {
             }
           }
 
-          UiStatisticsButton {
-            visible: root.addStage === "" && !root.blankSlate
-            width: parent.width
-          }
-
           // ---------- Make something ----------
           PanelSeparator {
             visible: root.addStage === "" && !root.blankSlate
@@ -1732,16 +1731,6 @@ Panel {
         }
       }
     }
-  }
-
-  component UiStatisticsButton: Button {
-    text: statisticsStrings.t("title")
-    foreground: root.foreground
-    fontFamily: root.fontFamily
-    background: root.track
-    hasCursor: root.hasKey("statistics", 0)
-    onHovered: function(hovered) { if (hovered) root.pointAt("statistics", 0) }
-    onClicked: root.showStatistics()
   }
 
   // Adding a subscription, in place of the list: pick, name, sign in.
@@ -2183,6 +2172,8 @@ Panel {
         anchors.leftMargin: Style.space(8)
         anchors.baseline: sectionName.baseline
         visible: !section.multi && text !== ""
+        width: statisticsLink.visible ? Math.min(implicitWidth, Math.max(0, statisticsLink.x - x - Style.space(12) - (sectionNote.visible ? sectionNote.width + Style.space(8) : 0))) : implicitWidth
+        elide: Text.ElideRight
         textFormat: Text.PlainText
         // A network model names its host where a plan would be.
         text: section.remote ? section.model.host : section.model || section.offer ? "" : root.planLabel(section.provider)
@@ -2192,11 +2183,23 @@ Panel {
       }
 
       UsageNote {
+        id: sectionNote
         anchors.left: sectionPlan.visible ? sectionPlan.right : sectionName.right
         anchors.leftMargin: Style.space(8)
         anchors.verticalCenter: sectionName.verticalCenter
         visible: !section.multi && message !== ""
         record: section.provider
+      }
+
+      TextLink {
+        id: statisticsLink
+        anchors.right: sectionLaunch.visible ? sectionLaunch.left : parent.right
+        anchors.rightMargin: sectionLaunch.visible ? Style.space(12) : 0
+        anchors.verticalCenter: parent.verticalCenter
+        visible: section.providerIndex === root.statisticsProviderIndex && root.statisticsProviderIndex >= 0
+        text: statisticsStrings.t("title")
+        picked: root.hasKey("statistics", section.providerIndex)
+        onClicked: root.showStatistics()
       }
 
       // Shares this machine's running model with the tailnet, or stops

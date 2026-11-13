@@ -20,7 +20,7 @@
   "selectDay": "Select a square for daily activity.",
   "partial": "Some activity could not be read.",
   "error": "Could not update statistics.",
-  "heading": "Agents",
+  "heading": "Codex",
   "updating": "Statistics · updating…",
   "loadingHistory": "Reading local history…",
   "closeStatistics": "Back to Agents",

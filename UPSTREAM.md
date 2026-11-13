@@ -10,7 +10,7 @@ Upstream source: [basecamp/omarchy](https://github.com/basecamp/omarchy).
 
 ## Inherited code and assets
 
-- `AgentsPanel.qml`: the built-in Agents panel, with a Statistics entry,
+- `AgentsPanel.qml`: the built-in Agents panel, with a Statistics link in the Codex header,
   view switching, and state reset when the panel closes.
 - `HeroButton.qml`: the built-in Agents hero button, extracted for reuse
   by the panel and preview renderer.

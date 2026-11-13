@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- Move Statistics into the Codex header as a text link and label its view Codex.
+- Keep keyboard navigation and return focus within the Codex section.
+- Match the preview's close control and frame to the native panel.
+
 ## 1.1.1
 
 First public GitHub release.

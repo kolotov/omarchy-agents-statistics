@@ -132,7 +132,19 @@ Column {
         title: strings.t("heading")
         meta: worker.running ? (root.hasSnapshot ? strings.t("updating") : strings.t("loading")) : strings.t("title")
         iconComponent: Component {
-            PlainText { text: "󰚩"; font.pixelSize: Style.font.display }
+            Image {
+                readonly property color surface: Commons.Color.popups.background
+                function luminance(channel) {
+                    return channel <= 0.03928 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4)
+                }
+                readonly property bool light: luminance(surface.r) * 0.2126 + luminance(surface.g) * 0.7152 + luminance(surface.b) * 0.0722 >= 0.5
+                width: Style.font.display
+                height: width
+                source: Qt.resolvedUrl(light ? "assets/codex-light.svg" : "assets/codex.svg")
+                sourceSize.width: width * 2
+                sourceSize.height: height * 2
+                fillMode: Image.PreserveAspectFit
+            }
         }
         trailingControl: root.returnControl
     }
