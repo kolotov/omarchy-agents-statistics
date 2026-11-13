@@ -1569,6 +1569,8 @@ Panel {
           active: root.opened && root.statisticsOpen
           returnControl: Component {
             HeroButton {
+              fontFamily: root.fontFamily
+              onHasCursorChanged: if (hasCursor) root.revealItem(this)
               hasCursor: statisticsView.selectedCell < 0 && statisticsView.selectedAction === 0
               glyph: "󰅖"
               tooltip: statisticsStrings.t("closeStatistics")
@@ -1639,6 +1641,8 @@ Panel {
                 visible: root.addButtonShown
 
                 HeroButton {
+                  fontFamily: root.fontFamily
+                  onHasCursorChanged: if (hasCursor) root.revealItem(this)
                   visible: root.addButtonShown
                   hasCursor: root.hasKey("add")
                   onHovered: root.pointAt("add")
@@ -2762,47 +2766,6 @@ Panel {
       text: root.starterLocalModel && !root.shiftHeld
         ? Commons.I18n.t("agents.startLocalOnNew").arg(tile.title.toLowerCase()).arg(root.starterLocalModel.name || root.starterLocalModel.recipe)
         : Commons.I18n.t("agents.startOnNew").arg(tile.title.toLowerCase())
-    }
-  }
-
-  // The tinted square in the hero's corner: start an agent, add a subscription.
-  component HeroButton: Rectangle {
-    id: heroButton
-    signal clicked()
-    signal hovered()
-    property string glyph: ""
-    property string tooltip: ""
-    property bool hasCursor: false
-    implicitWidth: Style.space(34)
-    implicitHeight: implicitWidth
-    radius: Style.cornerRadius
-    // The cursor needs more than a shade deeper to read on a tinted square.
-    color: root.alpha(Commons.Color.accent, hasCursor ? 0.3 : 0.12)
-    border.width: hasCursor ? Math.max(1, Style.hoverBorderWidth) : 0
-    border.color: Commons.Color.accent
-    onHasCursorChanged: if (hasCursor) root.revealItem(heroButton)
-
-    Text {
-      anchors.centerIn: parent
-      textFormat: Text.PlainText
-      text: heroButton.glyph
-      color: Commons.Color.accent
-      font.family: root.fontFamily
-      font.pixelSize: Style.font.heading
-    }
-
-    MouseArea {
-      id: heroMouse
-      anchors.fill: parent
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-      onEntered: heroButton.hovered()
-      onClicked: heroButton.clicked()
-    }
-
-    PanelToolTip {
-      visible: heroMouse.containsMouse
-      text: heroButton.tooltip
     }
   }
 

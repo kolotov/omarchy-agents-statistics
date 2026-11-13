@@ -12,6 +12,8 @@ Upstream source: [basecamp/omarchy](https://github.com/basecamp/omarchy).
 
 - `AgentsPanel.qml`: the built-in Agents panel, with a Statistics entry,
   view switching, and state reset when the panel closes.
+- `HeroButton.qml`: the built-in Agents hero button, extracted for reuse
+  by the panel and preview renderer.
 - `Main.qml` and `Agent.qml`: the built-in usage-record display and watchers.
 - `vendor/Reorder.js`: only the row-reordering functions used by Agents,
   extracted from the built-in Elsewhen model.

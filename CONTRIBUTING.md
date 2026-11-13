@@ -44,7 +44,8 @@ bar settings, restoration of the built-in Agents widget, and panel reopening.
 
 ## Preview
 
-The UI test renders light and dark previews from synthetic activity:
+The UI test renders light and dark previews from synthetic activity, using
+the panel's shared hero button, width, padding, and Omarchy border surface:
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_ui.py -v

@@ -8,23 +8,32 @@ import "Plugin" as Plugin
 Window {
     id: window
     visible: true
-    width: 870
-    height: Math.ceil(view.implicitHeight + 48)
+    width: Commons.Style.space(820)
+    height: Math.ceil(view.implicitHeight + card.contentTopInset + card.contentBottomInset)
     color: Commons.Color.background
     property bool returned: false
     readonly property string maliciousText: '<img src="https://example.invalid/tracker"><b>markup</b>'
     readonly property string outputDirectory: Quickshell.env("OMARCHY_STATS_TEST_OUTPUT")
-    Rectangle { anchors.fill: parent; color: Commons.Color.background; z: -1 }
+    Ui.BorderSurface {
+        id: card
+        anchors.fill: parent
+        color: Commons.Color.popups.background
+        borderSpec: Commons.Border.surfaceSpec("popups", "border", Commons.Color.popups.border, Math.max(1, Commons.Style.space(2)))
+        padding: Commons.Style.spacing.popupPadding
+        radius: Commons.Style.cornerRadius
 
-    Plugin.StatisticsView {
-        id: view
-        x: 24; y: 24; width: parent.width - 48
-        today: new Date(2026, 10, 13, 12)
-        cacheDirectory: decodeURIComponent(Qt.resolvedUrl("cache").toString().replace(/^file:\/\//, ""))
-        returnControl: Component {
-            Ui.Button { text: "×"; onClicked: view.back() }
+        Plugin.StatisticsView {
+            id: view
+            x: card.contentLeftInset
+            y: card.contentTopInset
+            width: card.width - card.contentLeftInset - card.contentRightInset
+            today: new Date(2026, 10, 13, 12)
+            cacheDirectory: decodeURIComponent(Qt.resolvedUrl("cache").toString().replace(/^file:\/\//, ""))
+            returnControl: Component {
+                Plugin.HeroButton { glyph: "󰅖"; onClicked: view.back() }
+            }
+            onBack: window.returned = true
         }
-        onBack: window.returned = true
     }
     Ui.PanelToolTip { id: tooltip; text: window.maliciousText }
     Ui.PanelHero { id: heroProbe; visible: false; title: window.maliciousText; meta: window.maliciousText }
@@ -50,6 +59,7 @@ Window {
         Commons.Color.foreground = foreground
         Commons.Color.background = background
         Commons.Color.popups.background = background
+        Commons.Color.popups.border = accent
         Commons.Color.accent = accent
     }
     Timer {
