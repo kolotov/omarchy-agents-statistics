@@ -14,6 +14,8 @@ Both screenshots use fictional accounts and activity.
 The panel follows your Omarchy theme, including light and dark themes.
 It refreshes automatically, shows the last saved totals immediately, and uses
 the same close control and keyboard navigation as the native Agents panel.
+The calendar is preloaded asynchronously while Agents is open and kept for
+reuse; opening Agents does not create the entire calendar synchronously.
 
 ## Requirements
 

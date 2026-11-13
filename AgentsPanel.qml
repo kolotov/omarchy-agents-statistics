@@ -1499,6 +1499,7 @@ Panel {
 
     content: PanelKeyCatcher {
       id: keyCatcher
+      readonly property Item statisticsView: statisticsLoader.item
       property alias panelFlick: panelFlick
       property alias hero: hero
       property alias column: column
@@ -1531,13 +1532,13 @@ Panel {
         onCanceled: root.deleteTarget = null
         onConfirmed: root.confirmDelete()
       }
-      implicitHeight: root.statisticsOpen ? statisticsView.implicitHeight : column.implicitHeight
+      implicitHeight: root.statisticsOpen && statisticsView ? statisticsView.implicitHeight : column.implicitHeight
       anchors.fill: parent
       reorderable: !root.statisticsOpen && root.addStage === "" && !root.renaming
       onReorderRequested: function(dy) { root.reorderProvider(dy) }
 
       onMoveRequested: function(dx, dy) {
-        if (root.statisticsOpen) { statisticsView.move(dx, dy); return }
+        if (root.statisticsOpen) { if (statisticsView) statisticsView.move(dx, dy); return }
         // Naming and signing in have their own fields; there the arrows scroll.
         if (root.addStage === "" || root.addStage === "local" || root.addStage === "network" || root.picking) root.moveKey(dx, dy)
         else if (dy !== 0)
@@ -1546,16 +1547,26 @@ Panel {
       }
       onDeleteRequested: if (!root.statisticsOpen) root.deleteSelected()
       blocked: root.renaming || root.deleteTarget !== null
-      onActivateRequested: function(modifiers) { if (root.statisticsOpen) statisticsView.activate(); else root.activateSelection(modifiers) }
+      onActivateRequested: function(modifiers) {
+        if (root.statisticsOpen) { if (statisticsView) statisticsView.activate() }
+        else root.activateSelection(modifiers)
+      }
       onCloseRequested: {
         if (root.statisticsOpen) { root.closeStatistics(); return }
         if (root.dragIndex >= 0) root.settleProviderDrag(true)
         else if (root.addStage !== "") root.cancelAdd()
         else root.close()
       }
-      onTabRequested: function(direction) { if (root.statisticsOpen) { statisticsView.selectedCell = -1; statisticsView.selectedAction = (statisticsView.selectedAction + direction + 4) % 4 } else root.switchPanel(direction) }
+      onTabRequested: function(direction) {
+        if (root.statisticsOpen) {
+          if (statisticsView) {
+            statisticsView.selectedCell = -1
+            statisticsView.selectedAction = (statisticsView.selectedAction + direction + 4) % 4
+          }
+        } else root.switchPanel(direction)
+      }
       onTextKey: function(t) {
-        if (root.statisticsOpen) { if (t.toLowerCase() === "r") statisticsView.refresh(); return }
+        if (root.statisticsOpen) { if (statisticsView && t.toLowerCase() === "r") statisticsView.refresh(); return }
         if (t.toLowerCase() === "s") { root.showStatistics(); return }
         if (t === "r" || t === "R") root.refreshNow()
         else if (t === "m" || t === "M") root.toggleSwitchMode()
@@ -1568,26 +1579,45 @@ Panel {
         visible: root.statisticsOpen
         clip: true
         contentWidth: width
-        contentHeight: statisticsView.implicitHeight
+        contentHeight: keyCatcher.statisticsView ? keyCatcher.statisticsView.implicitHeight : 0
         boundsBehavior: Flickable.StopAtBounds
         ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
-        StatisticsView {
-          id: statisticsView
+        Loader {
+          id: statisticsLoader
+          objectName: "statisticsLoader"
+          property bool keepLoaded: false
           width: parent.width
-          active: root.opened && root.statisticsOpen
-          returnControl: Component {
-            HeroButton {
-              fontFamily: root.fontFamily
-              onHasCursorChanged: if (hasCursor) root.revealItem(this)
-              hasCursor: statisticsView.selectedCell < 0 && statisticsView.selectedAction === 0
-              glyph: "󰅖"
-              tooltip: statisticsStrings.t("closeStatistics")
-              onHovered: { statisticsView.selectedCell = -1; statisticsView.selectedAction = 0 }
-              onClicked: statisticsView.back()
+          asynchronous: true
+          active: root.opened || root.statisticsOpen || keepLoaded
+          visible: status === Loader.Ready
+          onLoaded: keepLoaded = true
+          sourceComponent: StatisticsView {
+            id: statisticsView
+            active: root.opened && root.statisticsOpen
+            returnControl: Component {
+              HeroButton {
+                fontFamily: root.fontFamily
+                onHasCursorChanged: if (hasCursor) root.revealItem(this)
+                hasCursor: statisticsView.selectedCell < 0 && statisticsView.selectedAction === 0
+                glyph: "󰅖"
+                tooltip: statisticsStrings.t("closeStatistics")
+                onHovered: { statisticsView.selectedCell = -1; statisticsView.selectedAction = 0 }
+                onClicked: statisticsView.back()
+              }
             }
+            onBack: root.closeStatistics()
           }
-          onBack: root.closeStatistics()
         }
+      }
+
+      Text {
+        anchors.centerIn: parent
+        visible: root.statisticsOpen && !keyCatcher.statisticsView
+        textFormat: Text.PlainText
+        text: statisticsLoader.status === Loader.Error ? statisticsStrings.t("error") : statisticsStrings.t("loading")
+        color: root.dim
+        font.family: root.fontFamily
+        font.pixelSize: Style.font.bodySmall
       }
 
       Flickable {

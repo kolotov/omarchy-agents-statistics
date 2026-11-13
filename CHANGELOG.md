@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+- Preload the Statistics view asynchronously while Agents is open, keeping
+  calendar creation out of its synchronous opening path.
+- Show a loading message if Statistics is opened before the calendar is ready.
+
 ## 1.1.2
 
 - Move Statistics into the Codex header as a text link and label its view Codex.
